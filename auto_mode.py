@@ -1,4 +1,6 @@
 from tkinter import *
+from datetime import datetime
+
 class AutoMode:
     def __init__(self, root):
         self.root = root
@@ -13,7 +15,7 @@ class AutoMode:
         main_frame.pack(padx=30, pady=5, fill='both', expand=True)
 
         header = Frame(main_frame, bg='gray')
-        header.place(x=30, y=10, width=780, height=50)
+        header.place(x=30, y=10, width=805, height=50)
         Label(header, text="TRIM COMPUTER LOWER ASSEMBLY STATION VISION INSPECTION LH", bg='gray', fg='white', font=("Arial", 12, "bold")).pack()
 
         vision_frame = Frame(main_frame, bg='black')
@@ -24,7 +26,6 @@ class AutoMode:
         machine_frame = Frame(main_frame, bg='#f8f9fa', bd=2, relief='groove')
         machine_frame.place(x=535, y=65, width=300, height=350)
 
-        
         Label(machine_frame, text="Machine Data Status", font=("Arial", 12, "bold"),
             bg='#343a40', fg='white', pady=10).pack(fill='x')
 
@@ -33,26 +34,28 @@ class AutoMode:
             Label(parent, text=label_text, bg='#f8f9fa', font=("Arial", 10, "bold")).pack(pady=(15, 2))
             Entry(parent, font=("Arial", 12), width=28, bd=1, relief="solid").pack(pady=(0, 5))
 
-        # Fields
-        
         labeled_entry(machine_frame, "Printed Data")
         labeled_entry(machine_frame, "Live Data")
         labeled_entry(machine_frame, "Scanned Data")
 
-        # Connection Status Section
+        # # Connection Status Section
         connection_frame = Frame(main_frame, bg='white', bd=2, relief='ridge')
         connection_frame.place(x=840, y=10, width=350, height=60)
-        Label(connection_frame, text="PLC Status", bg='white', font=("Arial", 10, "bold")).grid(row=0, column=0, padx=20)
-        Label(connection_frame, text="Connected", bg='black', fg='green', font=("Arial", 10)).grid(row=1, column=0)
-        Label(connection_frame, text="Camera Status", bg='white', font=("Arial", 10, "bold")).grid(row=0, column=1, padx=20)
-        Label(connection_frame, text="Connected", bg='black', fg='green', font=("Arial", 10)).grid(row=1, column=1)
-        
+        status_inner = Frame(connection_frame, bg='white')
+        status_inner.place(relx=0.5, rely=0.5, anchor='center')
 
-        # Date and Time Section
+        Label(status_inner, text="PLC: ", bg='white', font=("Arial", 11, "bold")).pack(side='left')
+        Label(status_inner, text="Connected", bg='white', fg='green', font=("Arial", 11, "bold")).pack(side='left')
+        Label(status_inner, text="  |  Camera: ", bg='white', font=("Arial", 11, "bold")).pack(side='left')
+        Label(status_inner, text="Connected", bg='white', fg='green', font=("Arial", 11, "bold")).pack(side='left')
+
+        # Date and Time Section (LIVE)
         datetime_frame = Frame(main_frame, bg='white', bd=2, relief='ridge')
-        datetime_frame.place(x=840, y=80, width=350, height=50)
-        Label(datetime_frame, text="Date : 25 - March - 2025", bg='white', font=("Arial", 10)).pack()
-        Label(datetime_frame, text="Time : 02:54:31 pm", bg='white', font=("Arial", 10)).pack()
+        datetime_frame.place(x=840, y=70, width=350, height=50)
+        self.datetime_label = Label(datetime_frame, text="", bg='white', font=("Arial", 10, "bold"))
+        self.datetime_label.pack()
+
+        self.update_datetime()  # Start auto update
 
         # Status Information Section
         status_frame = Frame(main_frame, bg='white', bd=2, relief='ridge')
@@ -62,38 +65,37 @@ class AutoMode:
 
         # Result Section
         result_frame = Frame(main_frame, bg='red', bd=2, relief='ridge')
-        result_frame.place(x=30, y=420, width=780, height=50)
+        result_frame.place(x=30, y=420, width=805, height=50)
         Label(result_frame, text="Result : WRONG Part/ NG PART", bg='red', fg='white', font=("Arial", 12, "bold")).pack()
 
         # Parts Count Section
         count_frame = Frame(main_frame, bg='white', bd=2, relief='ridge')
-        count_frame.place(x=30, y=480, width=780, height=80)  
+        count_frame.place(x=30, y=480, width=805, height=80)  
 
-        # Configure grid columns to auto-expand and center
         count_frame.grid_columnconfigure(0, weight=1)
         count_frame.grid_columnconfigure(1, weight=1)
         count_frame.grid_columnconfigure(2, weight=1)
 
-        # Row 0 - Labels
         Label(count_frame, text="OK PARTS COUNT", bg='white', font=("Arial", 10, "bold")).grid(row=0, column=0, pady=(10, 2))
         Label(count_frame, text="NG PARTS COUNT", bg='white', font=("Arial", 10, "bold")).grid(row=0, column=1, pady=(10, 2))
         Label(count_frame, text="TOTAL PARTS COUNT", bg='white', font=("Arial", 10, "bold")).grid(row=0, column=2, pady=(10, 2))
 
-        # Row 1 - Values
         Label(count_frame, text="857", bg='white', font=("Arial", 12, "bold")).grid(row=1, column=0)
         Label(count_frame, text="19", bg='white', font=("Arial", 12, "bold")).grid(row=1, column=1)
         Label(count_frame, text="876", bg='white', font=("Arial", 12, "bold")).grid(row=1, column=2)
 
-
-        
         logout_button = Button(main_frame, text="Log Out", bg='red', fg='white', font=("Arial", 12, "bold"),command=self.logout)
         logout_button.place(x=840, y=510, width=350, height=50)
-    
+
+    def update_datetime(self):
+        now = datetime.now()
+        datetime_text = now.strftime("Date: %d - %B - %Y  |  Time: %I:%M:%S %p")
+        self.datetime_label.config(text=datetime_text)
+        self.datetime_label.after(1000, self.update_datetime)
+
     def logout(self):
         from login_system import Login
         Login(self.root)
-
-        # Button(root, text="Back to Dashboard", command=self.back, font=("Arial", 14)).pack(pady=50)
 
     def back(self):
         from admin_dashbord import AdminDashboard
